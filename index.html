@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>État des Lieux - Entretien & Sécurité</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card.blue { background: #e3f2fd; border: 2px solid #2196f3; }
+        .stat-card.green { background: #e8f5e9; border: 2px solid #4caf50; }
+        .stat-card.yellow { background: #fff9c4; border: 2px solid #ffc107; }
+        .stat-card.red { background: #ffebee; border: 2px solid #f44336; }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .room-section {
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .room-header {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            min-width: 800px;
+        }
+        
+        th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .priority-haute { background: #ffcdd2; }
+        .priority-moyenne { background: #fff9c4; }
+        .priority-faible { background: #c8e6c9; }
+        
+        .section-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 État des Lieux - Entretien & Sécurité</h1>
+        <p class="subtitle">Organisme de Formation</p>
+        
+        <div class="stats">
+            <div class="stat-card blue">
+                <div class="stat-number" id="totalLocaux">0</div>
+                <div class="stat-label">Locaux</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-number" id="totalConforme">0</div>
+                <div class="stat-label">Conforme</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="stat-number" id="totalSurveiller">0</div>
+                <div class="stat-label">À surveiller</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-number" id="totalNonConforme">0</div>
+                <div class="stat-label">Non conforme</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-success" onclick="ajouterLocal()">➕ Ajouter un local</button>
+            <button class="btn btn-primary" onclick="exporterCSV()">📥 Exporter CSV</button>
+        </div>
+        
+        <div id="locauxContainer"></div>
+    </div>
+
+    <script>
+        let locaux = [
+            {
+                id: 1,
+                nom: "Salle de formation 1",
+                surface: "50",
+                capacite: "20",
+                elements: [
+                    { categorie: "Incendie", element: "Extincteur", etat: "conforme", observations: "Vérifié le 15/10/2024", priorite: "faible" },
+                    { categorie: "Électricité", element: "Tableau électrique", etat: "conforme", observations: "", priorite: "faible" },
+                    { categorie: "Issues de secours", element: "Porte de secours", etat: "a-surveiller", observations: "Gonds à vérifier", priorite: "moyenne" }
+                ]
+            }
+        ];
+
+        const categories = [
+            "Incendie", 
+            "Électricité", 
+            "Éclairage", 
+            "Ventilation", 
+            "Chauffage", 
+            "Plomberie", 
+            "Issues de secours", 
+            "Accessibilité PMR", 
+            "Entretien", 
+            "Mobilier", 
+            "Signalétique", 
+            "Autre"
+        ];
+
+        function chargerDonnees() {
+            const donneesLocales = localStorage.getItem('etatLieuxLocaux');
+            if (donneesLocales) {
+                locaux = JSON.parse(donneesLocales);
+            }
+        }
+
+        function sauvegarderDonnees() {
+            localStorage.setItem('etatLieuxLocaux', JSON.stringify(locaux));
+        }
+
+        function render() {
+            const container = document.getElementById('locauxContainer');
+            container.innerHTML = '';
+            
+            locaux.forEach((local, index) => {
+                const section = document.createElement('div');
+                section.className = 'room-section';
+                section.innerHTML = `
+                    <div class="room-header">
+                        <div class="form-group">
+                            <label>Nom du local</label>
+                            <input type="text" value="${local.nom}" onchange="updateLocal(${index}, 'nom', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Surface (m²)</label>
+                            <input type="number" value="${local.surface}" onchange="updateLocal(${index}, 'surface', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Capacité (personnes)</label>
+                            <input type="number" value="${local.capacite}" onchange="updateLocal(${index}, 'capacite', this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="section-actions">
+                        <h3>Éléments de contrôle</h3>
+                        <div>
+                            <button class="btn btn-success" onclick="ajouterElement(${index})">➕ Ajouter élément</button>
+                            <button class="btn btn-danger" onclick="supprimerLocal(${index})">🗑️ Supprimer local</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Élément</th>
+                                    <th>État</th>
+                                    <th>Priorité</th>
+                                    <th>Observations</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="elements-${index}">
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(section);
+                
+                renderElements(index);
+            });
+            
+            updateStats();
+            sauvegarderDonnees();
+        }
+
+        function renderElements(localIndex) {
+            const tbody = document.getElementById(`elements-${localIndex}`);
+            tbody.innerHTML = '';
+            
+            locaux[localIndex].elements.forEach((elem, elemIndex) => {
+                const tr = document.createElement('tr');
+                tr.className = `priority-${elem.priorite}`;
+                tr.innerHTML = `
+                    <td>
+                        <select onchange="updateElement(${localIndex}, ${elemIndex}, 'categorie', this.value)">
+                            ${categories.map(cat => `<option value="${cat}" ${cat === elem.categorie ? 'selected' : ''}>${cat}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td><input type="text" value="${elem.element}" onchange="updateElement(${localIndex}, ${elemIndex}, 'element', this.value)" style="width: 100%;"></td>
+                    <td>
+                        <select onchange="updateElement(${localIndex}, ${elemIndex}, 'etat', this.value)">
+                            <option value="conforme" ${elem.etat === 'conforme' ? 'selected' : ''}>✅ Conforme</option>
+                            <option value="non-conforme" ${elem.etat === 'non-conforme' ? 'selected' : ''}>❌ Non conforme</option>
+                            <option value="a-surveiller" ${elem.etat === 'a-surveiller' ? 'selected' : ''}>⚠️ À surveiller</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select onchange="updateElement(${localIndex}, ${elemIndex}, 'priorite', this.value)">
+                            <option value="faible" ${elem.priorite === 'faible' ? 'selected' : ''}>Faible</option>
+                            <option value="moyenne" ${elem.priorite === 'moyenne' ? 'selected' : ''}>Moyenne</option>
+                            <option value="haute" ${elem.priorite === 'haute' ? 'selected' : ''}>Haute</option>
+                        </select>
+                    </td>
+                    <td><input type="text" value="${elem.observations}" onchange="updateElement(${localIndex}, ${elemIndex}, 'observations', this.value)" style="width: 100%;"></td>
+                    <td><button class="btn btn-danger" onclick="supprimerElement(${localIndex}, ${elemIndex})" style="margin: 0;">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function ajouterLocal() {
+            locaux.push({
+                id: Date.now(),
+                nom: `Nouveau local ${locaux.length + 1}`,
+                surface: "",
+                capacite: "",
+                elements: []
+            });
+            render();
+        }
+
+        function supprimerLocal(index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce local ?')) {
+                locaux.splice(index, 1);
+                render();
+            }
+        }
+
+        function ajouterElement(localIndex) {
+            locaux[localIndex].elements.push({
+                categorie: "Incendie",
+                element: "",
+                etat: "conforme",
+                observations: "",
+                priorite: "faible"
+            });
+            render();
+        }
+
+        function supprimerElement(localIndex, elemIndex) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+                locaux[localIndex].elements.splice(elemIndex, 1);
+                render();
+            }
+        }
+
+        function updateLocal(index, field, value) {
+            locaux[index][field] = value;
+            sauvegarderDonnees();
+        }
+
+        function updateElement(localIndex, elemIndex, field, value) {
+            locaux[localIndex].elements[elemIndex][field] = value;
+            render();
+        }
+
+        function updateStats() {
+            document.getElementById('totalLocaux').textContent = locaux.length;
+            
+            let conforme = 0, nonConforme = 0, surveiller = 0;
+            locaux.forEach(local => {
+                local.elements.forEach(elem => {
+                    if (elem.etat === 'conforme') conforme++;
+                    else if (elem.etat === 'non-conforme') nonConforme++;
+                    else if (elem.etat === 'a-surveiller') surveiller++;
+                });
+            });
+            
+            document.getElementById('totalConforme').textContent = conforme;
+            document.getElementById('totalNonConforme').textContent = nonConforme;
+            document.getElementById('totalSurveiller').textContent = surveiller;
+        }
+
+        function exporterCSV() {
+            let csv = 'Local,Surface (m²),Capacité,Catégorie,Élément,État,Observations,Priorité\n';
+            
+            locaux.forEach(local => {
+                local.elements.forEach(elem => {
+                    csv += `"${local.nom}","${local.surface}","${local.capacite}","${elem.categorie}","${elem.element}","${elem.etat}","${elem.observations}","${elem.priorite}"\n`;
+                });
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const date = new Date().toISOString().split('T')[0];
+            link.download = `etat_lieux_${date}.csv`;
+            link.click();
+            
+            alert('Export CSV réussi ! Le fichier a été téléchargé.');
+        }
+
+        chargerDonnees();
+        render();
+    </script>
+</body>
+</html>
